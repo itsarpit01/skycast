@@ -61,7 +61,7 @@ body {
 
 .page {
   flex: 1;
-  width: min(1100px, 100%);
+  width: min(1300px, 100%);
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
 }
@@ -146,12 +146,58 @@ body {
 
 .error { color: #ff8b7a; }
 .empty { color: var(--muted); }
-.place { margin: 2rem 0 1rem; font-size: 1.25rem; }
+.place {
+  margin: 2rem 0 1rem;
+  font-size: 1.25rem;
+  width: 100%;
+  text-align: left;
+}
 
+/* ---------- forecast grid ---------- */
+/* Default (large desktop): 5 cards per row */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
+  width: 100%;
+}
+
+/* Small laptop / large tablet: 4 per row */
+@media (max-width: 1150px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Tablet: 3 per row */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large phone: 2 per row */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .search {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 320px;
+  }
+
+  .search input {
+    max-width: none;
+  }
+}
+
+/* Small phone: 1 per row */
+@media (max-width: 400px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card {
