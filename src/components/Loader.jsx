@@ -1,5 +1,9 @@
 function Loader({ label = 'Loading…' }) {
-  return <p className="loader" role="status">{label}</p>
+  return (
+    <p className="loader" role="status">
+      {label}
+    </p>
+  )
 }
 
-export default Loadercd 
+export default Loader
