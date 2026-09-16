@@ -131,7 +131,7 @@ body {
   outline-offset: 2px;
 }
 
-.search button {
+.search button[type="submit"] {
   padding: 0.7rem 1.3rem;
   background: var(--sun);
   color: #1b1200;
@@ -142,7 +142,21 @@ body {
   cursor: pointer;
 }
 
-.search button:disabled { opacity: 0.6; cursor: default; }
+.search button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+
+.location-btn {
+  padding: 0.7rem 1rem;
+  background: rgb(158, 151, 151);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.location-btn:hover { border-color: var(--sun); }
+.location-btn:disabled { opacity: 0.6; cursor: default; }
 
 .error { color: #ff8b7a; }
 .empty { color: var(--muted); }
@@ -153,8 +167,6 @@ body {
   text-align: left;
 }
 
-/* ---------- forecast grid ---------- */
-/* Default (large desktop): 5 cards per row */
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -162,21 +174,17 @@ body {
   width: 100%;
 }
 
-/* Small laptop / large tablet: 4 per row */
 @media (max-width: 1150px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
-
-/* Tablet: 3 per row */
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Large phone: 2 per row */
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -193,7 +201,6 @@ body {
   }
 }
 
-/* Small phone: 1 per row */
 @media (max-width: 400px) {
   .grid {
     grid-template-columns: 1fr;

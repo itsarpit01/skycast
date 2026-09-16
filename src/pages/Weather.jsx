@@ -2,12 +2,12 @@ import { useState } from 'react'
 import SearchBar from '../components/SearchBar'
 import ForecastList from '../components/ForecastList'
 import Loader from '../components/Loader'
-import { getForecastByCity } from '../api/weatherApi'
+import { getForecastByCity, getForecastByCoords } from '../api/weatherApi'
 import { getErrorMessage } from '../utils/format'
 
 function Weather() {
-  const [place, setPlace] = useState(null)  // city info from the API
-  const [list, setList] = useState([])      // the 40 forecast items
+  const [place, setPlace] = useState(null)
+  const [list, setList] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -28,9 +28,30 @@ function Weather() {
     }
   }
 
+  async function handleLocationSearch(lat, lon) {
+    setLoading(true)
+    setError('')
+
+    try {
+      const { place, list } = await getForecastByCoords(lat, lon)
+      setPlace(place)
+      setList(list)
+    } catch (err) {
+      setPlace(null)
+      setList([])
+      setError(getErrorMessage(err))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section className="weather">
-      <SearchBar onSearch={handleSearch} loading={loading} />
+      <SearchBar
+        onSearch={handleSearch}
+        onLocationSearch={handleLocationSearch}
+        loading={loading}
+      />
 
       {error && <p className="error">{error}</p>}
       {loading && <Loader label="Fetching the forecast…" />}
