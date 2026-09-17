@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { validateSearch } from '../schemas/searchSchema'
 
-function SearchBar({ onSearch, onLocationSearch, loading }) {
+function SearchBar({ onSearch, onLocationSearch, onClear, loading, hasResult }) {
   const [city, setCity] = useState('')
   const [fieldError, setFieldError] = useState('')
   const [locating, setLocating] = useState(false)
@@ -46,6 +46,12 @@ function SearchBar({ onSearch, onLocationSearch, loading }) {
     )
   }
 
+  function handleClear() {
+    setCity('')
+    setFieldError('')
+    onClear()
+  }
+
   return (
     <form className="search" onSubmit={handleSubmit} noValidate>
       <div className="search-field">
@@ -72,6 +78,12 @@ function SearchBar({ onSearch, onLocationSearch, loading }) {
       >
         {locating ? 'Locating…' : '📍 Use my location'}
       </button>
+
+      {hasResult && (
+        <button type="button" className="clear-btn" onClick={handleClear}>
+          Clear
+        </button>
+      )}
     </form>
   )
 }

@@ -72,6 +72,8 @@ body {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* ---------- home / hero ---------- */
 .hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -141,10 +143,12 @@ body {
   .weather-icon { width: 60px; height: 60px; }
 }
 
+/* ---------- about ---------- */
 .about { max-width: 65ch; }
 .about h2 { margin-top: 2rem; font-size: 1.1rem; }
 .about li { color: var(--muted); }
 
+/* ---------- weather page ---------- */
 .weather {
   display: flex;
   flex-direction: column;
@@ -158,7 +162,8 @@ body {
   justify-content: center;
   gap: 0.6rem;
   width: 100%;
-  max-width: 420px;
+  max-width: 620px;
+  flex-wrap: wrap;
 }
 
 .search input {
@@ -178,6 +183,9 @@ body {
   outline-offset: 2px;
 }
 
+/* Only the Search submit button gets the orange fill.
+   Using [type="submit"] keeps this from also matching
+   the "Use my location" / "Clear" buttons. */
 .search button[type="submit"] {
   padding: 0.7rem 1.3rem;
   background: var(--sun);
@@ -191,8 +199,12 @@ body {
 
 .search button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
 
-.location-btn {
-  padding: 0.7rem 1rem;
+/* Location button and Clear button share the same
+   transparent/outlined style and sizing so all three
+   buttons in the row look consistent. */
+.location-btn,
+.clear-btn {
+  padding: 0.7rem 1.3rem;
   background: transparent;
   border: 1px solid var(--line);
   color: var(--text);
@@ -205,6 +217,10 @@ body {
 .location-btn:hover { border-color: var(--sun); }
 .location-btn:disabled { opacity: 0.6; cursor: default; }
 
+.clear-btn { color: var(--muted); }
+.clear-btn:hover { border-color: #ff8b7a; color: #ff8b7a; }
+.clear-btn:disabled { opacity: 0.6; cursor: default; }
+
 .error { color: #ff8b7a; }
 .empty { color: var(--muted); }
 .place {
@@ -214,6 +230,8 @@ body {
   text-align: left;
 }
 
+/* ---------- forecast grid ---------- */
+/* Default (large desktop): 5 cards per row */
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -221,18 +239,21 @@ body {
   width: 100%;
 }
 
+/* Small laptop / large tablet: 4 per row */
 @media (max-width: 1150px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
+/* Tablet: 3 per row */
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* Large phone: 2 per row */
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -249,6 +270,7 @@ body {
   }
 }
 
+/* Small phone: 1 per row */
 @media (max-width: 400px) {
   .grid {
     grid-template-columns: 1fr;

@@ -33,6 +33,13 @@ function Weather() {
     }
   }
 
+  function handleClear() {
+    localStorage.removeItem(STORAGE_KEY)
+    setPlace(null)
+    setList([])
+    setError('')
+  }
+
   async function handleSearch(city) {
     setLoading(true)
     setError('')
@@ -74,7 +81,9 @@ function Weather() {
       <SearchBar
         onSearch={handleSearch}
         onLocationSearch={handleLocationSearch}
+        onClear={handleClear}
         loading={loading}
+        hasResult={Boolean(place)}
       />
 
       {error && <p className="error">{error}</p>}
