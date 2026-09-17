@@ -1,36 +1,55 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import SearchBar from '../components/SearchBar'
 import ForecastList from '../components/ForecastList'
+import CurrentWeather from '../components/CurrentWeather'
 import Loader from '../components/Loader'
-import { getForecastByCity, getForecastByCoords } from '../api/weatherApi'
+import {
+  getForecastByCity,
+  getForecastByCoords,
+  getCurrentByCity,
+  getCurrentByCoords,
+} from '../api/weatherApi'
 import { getErrorMessage, formatDay } from '../utils/format'
 
 const STORAGE_KEY = 'skycast:lastForecast'
 
 function Weather() {
+  // basic info about the searched place
   const [place, setPlace] = useState(null)
+
+  // 5 day forecast list (many items, one every 3 hours)
   const [list, setList] = useState([])
+
+  // right now weather
+  const [current, setCurrent] = useState(null)
+
+  // loading and error messages
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // which day tab is selected ("all" shows everything)
   const [selectedDay, setSelectedDay] = useState('all')
 
+  // when the page first loads, try to get the last saved search from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
-        const { place, list } = JSON.parse(saved)
-        setPlace(place)
-        setList(list)
+        const savedData = JSON.parse(saved)
+        setPlace(savedData.place)
+        setList(savedData.list)
+        setCurrent(savedData.current)
       }
-    } catch {
+    } catch (err) {
       localStorage.removeItem(STORAGE_KEY)
     }
   }, [])
 
-  function saveToStorage(place, list) {
+  function saveToStorage(place, list, current) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ place, list }))
-    } catch {
+      const dataToSave = { place: place, list: list, current: current }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
+    } catch (err) {
     }
   }
 
@@ -38,6 +57,7 @@ function Weather() {
     localStorage.removeItem(STORAGE_KEY)
     setPlace(null)
     setList([])
+    setCurrent(null)
     setError('')
     setSelectedDay('all')
   }
@@ -48,17 +68,22 @@ function Weather() {
     setSelectedDay('all')
 
     try {
-      const { place, list } = await getForecastByCity(city)
-      setPlace(place)
-      setList(list)
-      saveToStorage(place, list)
+      const forecastData = await getForecastByCity(city)
+      const currentData = await getCurrentByCity(city)
+
+      setPlace(forecastData.place)
+      setList(forecastData.list)
+      setCurrent(currentData)
+
+      saveToStorage(forecastData.place, forecastData.list, currentData)
     } catch (err) {
       setPlace(null)
       setList([])
+      setCurrent(null)
       setError(getErrorMessage(err, city))
-    } finally {
-      setLoading(false)
     }
+
+    setLoading(false)
   }
 
   async function handleLocationSearch(lat, lon) {
@@ -67,41 +92,41 @@ function Weather() {
     setSelectedDay('all')
 
     try {
-      const { place, list } = await getForecastByCoords(lat, lon)
-      setPlace(place)
-      setList(list)
-      saveToStorage(place, list)
+      const forecastData = await getForecastByCoords(lat, lon)
+      const currentData = await getCurrentByCoords(lat, lon)
+
+      setPlace(forecastData.place)
+      setList(forecastData.list)
+      setCurrent(currentData)
+
+      saveToStorage(forecastData.place, forecastData.list, currentData)
     } catch (err) {
       setPlace(null)
       setList([])
+      setCurrent(null)
       setError(getErrorMessage(err))
-    } finally {
-      setLoading(false)
+    }
+
+    setLoading(false)
+  }
+
+  const days = []
+  for (let i = 0; i < list.length; i++) {
+    const dayLabel = formatDay(list[i].dt)
+    if (!days.includes(dayLabel)) {
+      days.push(dayLabel)
     }
   }
 
-  // Build the list of unique days present in the forecast,
-  // e.g. ["Thu, 17 Sept", "Fri, 18 Sept", ...] — max 5.
-  const days = useMemo(() => {
-    const seen = new Set()
-    const result = []
-
-    for (const item of list) {
-      const label = formatDay(item.dt)
-      if (!seen.has(label)) {
-        seen.add(label)
-        result.push(label)
+  let filteredList = list
+  if (selectedDay !== 'all') {
+    filteredList = []
+    for (let i = 0; i < list.length; i++) {
+      if (formatDay(list[i].dt) === selectedDay) {
+        filteredList.push(list[i])
       }
     }
-
-    return result
-  }, [list])
-
-  // Only the cards whose day matches the selected tab.
-  const filteredList = useMemo(() => {
-    if (selectedDay === 'all') return list
-    return list.filter((item) => formatDay(item.dt) === selectedDay)
-  }, [list, selectedDay])
+  }
 
   return (
     <section className="weather">
@@ -122,6 +147,13 @@ function Weather() {
         </h2>
       )}
 
+      {current && !loading && (
+        <div className="weather-dashboard">
+          <CurrentWeather data={current} />
+
+        </div>
+      )}
+
       {!loading && list.length > 0 && (
         <div className="day-filter">
           <button
@@ -131,6 +163,7 @@ function Weather() {
           >
             All days
           </button>
+
           {days.map((day) => (
             <button
               key={day}

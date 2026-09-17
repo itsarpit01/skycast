@@ -11,6 +11,15 @@ export function formatTime(unixSeconds) {
     hour: 'numeric', minute: '2-digit',
   })
 }
+export function formatSunTime(unixSeconds, timezoneOffsetSeconds) {
+  const utcMs = unixSeconds * 1000
+  const localMs = utcMs + timezoneOffsetSeconds * 1000
+  return new Date(localMs).toLocaleTimeString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  })
+}
 
 export function formatTemp(value) {
   return `${Math.round(value)}°`
