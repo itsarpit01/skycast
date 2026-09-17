@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import SearchBar from '../components/SearchBar'
 import ForecastList from '../components/ForecastList'
 import Loader from '../components/Loader'
 import { getForecastByCity, getForecastByCoords } from '../api/weatherApi'
-import { getErrorMessage } from '../utils/format'
+import { getErrorMessage, formatDay } from '../utils/format'
 
 const STORAGE_KEY = 'skycast:lastForecast'
 
@@ -12,6 +12,7 @@ function Weather() {
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedDay, setSelectedDay] = useState('all')
 
   useEffect(() => {
     try {
@@ -38,11 +39,13 @@ function Weather() {
     setPlace(null)
     setList([])
     setError('')
+    setSelectedDay('all')
   }
 
   async function handleSearch(city) {
     setLoading(true)
     setError('')
+    setSelectedDay('all')
 
     try {
       const { place, list } = await getForecastByCity(city)
@@ -61,6 +64,7 @@ function Weather() {
   async function handleLocationSearch(lat, lon) {
     setLoading(true)
     setError('')
+    setSelectedDay('all')
 
     try {
       const { place, list } = await getForecastByCoords(lat, lon)
@@ -75,6 +79,29 @@ function Weather() {
       setLoading(false)
     }
   }
+
+  // Build the list of unique days present in the forecast,
+  // e.g. ["Thu, 17 Sept", "Fri, 18 Sept", ...] — max 5.
+  const days = useMemo(() => {
+    const seen = new Set()
+    const result = []
+
+    for (const item of list) {
+      const label = formatDay(item.dt)
+      if (!seen.has(label)) {
+        seen.add(label)
+        result.push(label)
+      }
+    }
+
+    return result
+  }, [list])
+
+  // Only the cards whose day matches the selected tab.
+  const filteredList = useMemo(() => {
+    if (selectedDay === 'all') return list
+    return list.filter((item) => formatDay(item.dt) === selectedDay)
+  }, [list, selectedDay])
 
   return (
     <section className="weather">
@@ -95,7 +122,29 @@ function Weather() {
         </h2>
       )}
 
-      {!loading && list.length > 0 && <ForecastList list={list} />}
+      {!loading && list.length > 0 && (
+        <div className="day-filter">
+          <button
+            type="button"
+            className={selectedDay === 'all' ? 'day-btn active' : 'day-btn'}
+            onClick={() => setSelectedDay('all')}
+          >
+            All days
+          </button>
+          {days.map((day) => (
+            <button
+              key={day}
+              type="button"
+              className={selectedDay === day ? 'day-btn active' : 'day-btn'}
+              onClick={() => setSelectedDay(day)}
+            >
+              {day}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!loading && filteredList.length > 0 && <ForecastList list={filteredList} />}
 
       {!loading && !error && list.length === 0 && (
         <p className="empty">Search a city to see its forecast.</p>

@@ -230,6 +230,38 @@ body {
   text-align: left;
 }
 
+/* ---------- day filter tabs ---------- */
+.day-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.day-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.day-btn:hover {
+  border-color: var(--sun);
+  color: var(--text);
+}
+
+.day-btn.active {
+  background: var(--sun);
+  border-color: var(--sun);
+  color: #1b1200;
+  font-weight: 600;
+}
+
 /* ---------- forecast grid ---------- */
 /* Default (large desktop): 5 cards per row */
 .grid {
