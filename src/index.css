@@ -230,6 +230,51 @@ body {
   text-align: left;
 }
 
+/* ---------- current weather card ---------- */
+.current-weather {
+  width: 100%;
+  max-width: 500px;
+  background: var(--deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.current-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.current-temp {
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 700;
+}
+
+.current-desc {
+  margin: 0;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.current-stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1.5rem;
+  font-size: 0.85rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.current-stats div { display: flex; justify-content: space-between; }
+.current-stats dt { color: var(--muted); }
+.current-stats dd { margin: 0; }
+
 /* ---------- day filter tabs ---------- */
 .day-filter {
   display: flex;
@@ -299,6 +344,15 @@ body {
 
   .search input {
     max-width: none;
+  }
+
+  .current-main {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .current-stats {
+    grid-template-columns: 1fr;
   }
 }
 
