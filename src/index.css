@@ -73,6 +73,7 @@ body {
   font-size: 0.85rem;
 }
 
+/* ---------- home / hero ---------- */
 .hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -142,10 +143,12 @@ body {
   .weather-icon { width: 60px; height: 60px; }
 }
 
+/* ---------- about ---------- */
 .about { max-width: 65ch; }
 .about h2 { margin-top: 2rem; font-size: 1.1rem; }
 .about li { color: var(--muted); }
 
+/* ---------- weather page ---------- */
 .weather {
   display: flex;
   flex-direction: column;
@@ -180,6 +183,9 @@ body {
   outline-offset: 2px;
 }
 
+/* Only the Search submit button gets the orange fill.
+   Using [type="submit"] keeps this from also matching
+   the "Use my location" / "Clear" buttons. */
 .search button[type="submit"] {
   padding: 0.7rem 1.3rem;
   background: var(--sun);
@@ -193,6 +199,9 @@ body {
 
 .search button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
 
+/* Location button and Clear button share the same
+   transparent/outlined style and sizing so all three
+   buttons in the row look consistent. */
 .location-btn,
 .clear-btn {
   padding: 0.7rem 1.3rem;
@@ -221,6 +230,10 @@ body {
   text-align: left;
 }
 
+/* ---------- weather dashboard (current + air quality + map) ---------- */
+/* order is set explicitly on each card so Current Weather always
+   renders first (left-most), then Air Quality, then the Map —
+   regardless of JSX order or how the grid wraps on smaller screens. */
 .weather-dashboard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -231,7 +244,12 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* ---------- current weather card ----------
+   Matches the same card shape as Air Quality / Map: fixed max
+   width, vertical stack, sits in the grid alongside them rather
+   than spanning the full row. */
 .current-weather {
+  order: 1;
   width: 100%;
   max-width: 500px;
   background: var(--deep);
@@ -239,7 +257,7 @@ body {
   border-radius: 12px;
   padding: 1.5rem;
   text-align: left;
-  justify-self: start; 
+  justify-self: start;
   display: flex;
   flex-direction: column;
 }
@@ -298,6 +316,7 @@ body {
 .current-stats dt { color: var(--muted); }
 .current-stats dd { margin: 0; }
 
+/* ---------- day filter tabs ---------- */
 .day-filter {
   display: flex;
   flex-wrap: wrap;
@@ -329,6 +348,8 @@ body {
   font-weight: 600;
 }
 
+/* ---------- forecast grid ---------- */
+/* Default (large desktop): 5 cards per row */
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -336,18 +357,21 @@ body {
   width: 100%;
 }
 
+/* Small laptop / large tablet: 4 per row */
 @media (max-width: 1150px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
+/* Tablet: 3 per row */
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* Large phone: 2 per row */
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -363,11 +387,6 @@ body {
     max-width: none;
   }
 
-  .current-main {
-    flex-direction: column;
-    text-align: center;
-  }
-
   .current-header {
     flex-direction: column;
     align-items: flex-start;
@@ -379,6 +398,7 @@ body {
   }
 }
 
+/* Small phone: 1 per row */
 @media (max-width: 400px) {
   .grid {
     grid-template-columns: 1fr;
@@ -428,7 +448,9 @@ body {
 .stats dt { color: var(--muted); }
 .stats dd { margin: 0; }
 
+/* ---------- air pollution card ---------- */
 .air-pollution {
+  order: 2;
   width: 100%;
   max-width: 500px;
   background: var(--deep);
@@ -461,13 +483,16 @@ body {
   color: var(--muted);
 }
 
+/* color accents per AQI level, using left border for a quick visual cue */
 .aqi-good { border-left: 4px solid #4ade80; }
 .aqi-fair { border-left: 4px solid #a3e635; }
 .aqi-moderate { border-left: 4px solid #facc15; }
 .aqi-poor { border-left: 4px solid #fb923c; }
 .aqi-very-poor { border-left: 4px solid #f87171; }
 
+/* ---------- weather map card ---------- */
 .weather-map {
+  order: 3;
   width: 100%;
   max-width: 500px;
   background: var(--deep);
@@ -489,12 +514,41 @@ body {
 
 .map-container {
   width: 100%;
-  flex: 1; 
+  flex: 1; /* fill remaining height so this card matches the others */
   min-height: 200px;
   border-radius: 8px;
   overflow: hidden;
 }
 
+/* Leaflet renders map tiles as <img> tags. If any global CSS rule
+   (like `img { max-width: 100% }`) exists elsewhere in the project,
+   it will squish/misalign the tiles. This forces Leaflet's own
+   tile sizing to always win. */
 .leaflet-container img {
   max-width: none !important;
+}
+
+/* ---------- OpenWeatherMap embedded widget card ---------- */
+.weather-widget-row {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.weather-widget {
+  width: 100%;
+  max-width: 950px;
+  background: var(--deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+/* OpenWeatherMap's widget brings its own styling/colors (it isn't
+   theme-aware) — just let it render at its natural size */
+.weather-widget > div:last-child {
+  display: flex;
+  justify-content: center;
 }

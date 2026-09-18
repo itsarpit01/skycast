@@ -4,6 +4,7 @@ import ForecastList from '../components/ForecastList'
 import CurrentWeather from '../components/CurrentWeather'
 import AirPollution from '../components/AirPollution'
 import WeatherMap from '../components/WeatherMap'
+import WeatherWidget from '../components/WeatherWidget'
 import Loader from '../components/Loader'
 import {
   getForecastByCity,
@@ -153,11 +154,9 @@ function Weather() {
         </h2>
       )}
 
-      {(current || airPollution) && !loading && (
-        <div className="weather-dashboard">
-          {current && <CurrentWeather data={current} />}
-          {airPollution && <AirPollution data={airPollution} />}
-          {place && <WeatherMap place={place} />}
+      {place?.id && !loading && (
+        <div className="weather-widget-row">
+          <WeatherWidget cityId={place.id} />
         </div>
       )}
 
@@ -180,6 +179,14 @@ function Weather() {
               {day}
             </button>
           ))}
+        </div>
+      )}
+
+      {(current || airPollution) && !loading && (
+        <div className="weather-dashboard">
+          {current && <CurrentWeather data={current} />}
+          {airPollution && <AirPollution data={airPollution} />}
+          {place && <WeatherMap place={place} />}
         </div>
       )}
 
