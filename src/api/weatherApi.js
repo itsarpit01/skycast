@@ -90,3 +90,20 @@ export async function getCurrentByCoords(lat, lon) {
     normalizeError(err, `getCurrentByCoords(${lat}, ${lon})`)
   }
 }
+export async function getAirPollution(lat, lon) {
+  if (typeof lat !== 'number' || typeof lon !== 'number') {
+    throw new Error('Invalid coordinates.')
+  }
+
+  try {
+    const res = await axiosClient.get('/air_pollution', { params: { lat, lon } })
+
+    if (!res.data?.list || !res.data.list[0]) {
+      throw new Error('Unexpected response from the air pollution service.')
+    }
+
+    return res.data.list[0]
+  } catch (err) {
+    normalizeError(err, `getAirPollution(${lat}, ${lon})`)
+  }
+}

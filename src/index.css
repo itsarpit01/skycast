@@ -73,7 +73,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* ---------- home / hero ---------- */
 .hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -143,12 +142,10 @@ body {
   .weather-icon { width: 60px; height: 60px; }
 }
 
-/* ---------- about ---------- */
 .about { max-width: 65ch; }
 .about h2 { margin-top: 2rem; font-size: 1.1rem; }
 .about li { color: var(--muted); }
 
-/* ---------- weather page ---------- */
 .weather {
   display: flex;
   flex-direction: column;
@@ -183,9 +180,6 @@ body {
   outline-offset: 2px;
 }
 
-/* Only the Search submit button gets the orange fill.
-   Using [type="submit"] keeps this from also matching
-   the "Use my location" / "Clear" buttons. */
 .search button[type="submit"] {
   padding: 0.7rem 1.3rem;
   background: var(--sun);
@@ -199,9 +193,6 @@ body {
 
 .search button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
 
-/* Location button and Clear button share the same
-   transparent/outlined style and sizing so all three
-   buttons in the row look consistent. */
 .location-btn,
 .clear-btn {
   padding: 0.7rem 1.3rem;
@@ -230,18 +221,16 @@ body {
   text-align: left;
 }
 
-/* ---------- weather dashboard (current + future cards) ---------- */
 .weather-dashboard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   width: 100%;
-  align-items: start;
+  align-items: stretch;
   justify-content: flex-start;
   margin-bottom: 1.5rem;
 }
 
-/* ---------- current weather card ---------- */
 .current-weather {
   width: 100%;
   max-width: 500px;
@@ -250,7 +239,9 @@ body {
   border-radius: 12px;
   padding: 1.5rem;
   text-align: left;
-  justify-self: start; /* keep it pinned to the left of its grid cell */
+  justify-self: start; 
+  display: flex;
+  flex-direction: column;
 }
 
 .current-header {
@@ -307,7 +298,6 @@ body {
 .current-stats dt { color: var(--muted); }
 .current-stats dd { margin: 0; }
 
-/* ---------- day filter tabs ---------- */
 .day-filter {
   display: flex;
   flex-wrap: wrap;
@@ -339,8 +329,6 @@ body {
   font-weight: 600;
 }
 
-/* ---------- forecast grid ---------- */
-/* Default (large desktop): 5 cards per row */
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -348,21 +336,18 @@ body {
   width: 100%;
 }
 
-/* Small laptop / large tablet: 4 per row */
 @media (max-width: 1150px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Tablet: 3 per row */
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Large phone: 2 per row */
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -394,7 +379,6 @@ body {
   }
 }
 
-/* Small phone: 1 per row */
 @media (max-width: 400px) {
   .grid {
     grid-template-columns: 1fr;
@@ -443,3 +427,74 @@ body {
 .stats div { display: flex; justify-content: space-between; }
 .stats dt { color: var(--muted); }
 .stats dd { margin: 0; }
+
+.air-pollution {
+  width: 100%;
+  max-width: 500px;
+  background: var(--deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+}
+
+.aqi-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.aqi-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.aqi-text {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.aqi-good { border-left: 4px solid #4ade80; }
+.aqi-fair { border-left: 4px solid #a3e635; }
+.aqi-moderate { border-left: 4px solid #facc15; }
+.aqi-poor { border-left: 4px solid #fb923c; }
+.aqi-very-poor { border-left: 4px solid #f87171; }
+
+.weather-map {
+  width: 100%;
+  max-width: 500px;
+  background: var(--deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-layer-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.map-container {
+  width: 100%;
+  flex: 1; 
+  min-height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.leaflet-container img {
+  max-width: none !important;
+}

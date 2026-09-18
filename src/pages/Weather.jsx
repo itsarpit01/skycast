@@ -1,55 +1,52 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import SearchBar from '../components/SearchBar'
 import ForecastList from '../components/ForecastList'
 import CurrentWeather from '../components/CurrentWeather'
+import AirPollution from '../components/AirPollution'
+import WeatherMap from '../components/WeatherMap'
 import Loader from '../components/Loader'
 import {
   getForecastByCity,
   getForecastByCoords,
   getCurrentByCity,
   getCurrentByCoords,
+  getAirPollution,
 } from '../api/weatherApi'
 import { getErrorMessage, formatDay } from '../utils/format'
 
 const STORAGE_KEY = 'skycast:lastForecast'
 
 function Weather() {
-  // basic info about the searched place
   const [place, setPlace] = useState(null)
-
-  // 5 day forecast list (many items, one every 3 hours)
   const [list, setList] = useState([])
-
-  // right now weather
   const [current, setCurrent] = useState(null)
-
-  // loading and error messages
+  const [airPollution, setAirPollution] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  // which day tab is selected ("all" shows everything)
   const [selectedDay, setSelectedDay] = useState('all')
 
-  // when the page first loads, try to get the last saved search from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
-        const savedData = JSON.parse(saved)
-        setPlace(savedData.place)
-        setList(savedData.list)
-        setCurrent(savedData.current)
+        const { place, list, current, airPollution } = JSON.parse(saved)
+        setPlace(place)
+        setList(list)
+        setCurrent(current ?? null)
+        setAirPollution(airPollution ?? null)
       }
-    } catch (err) {
+    } catch {
       localStorage.removeItem(STORAGE_KEY)
     }
   }, [])
 
-  function saveToStorage(place, list, current) {
+  function saveToStorage(place, list, current, airPollution) {
     try {
-      const dataToSave = { place: place, list: list, current: current }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
-    } catch (err) {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ place, list, current, airPollution })
+      )
+    } catch {
     }
   }
 
@@ -58,6 +55,7 @@ function Weather() {
     setPlace(null)
     setList([])
     setCurrent(null)
+    setAirPollution(null)
     setError('')
     setSelectedDay('all')
   }
@@ -68,22 +66,27 @@ function Weather() {
     setSelectedDay('all')
 
     try {
-      const forecastData = await getForecastByCity(city)
-      const currentData = await getCurrentByCity(city)
+      const [{ place, list }, currentData] = await Promise.all([
+        getForecastByCity(city),
+        getCurrentByCity(city),
+      ])
 
-      setPlace(forecastData.place)
-      setList(forecastData.list)
+      const airData = await getAirPollution(place.coord.lat, place.coord.lon)
+
+      setPlace(place)
+      setList(list)
       setCurrent(currentData)
-
-      saveToStorage(forecastData.place, forecastData.list, currentData)
+      setAirPollution(airData)
+      saveToStorage(place, list, currentData, airData)
     } catch (err) {
       setPlace(null)
       setList([])
       setCurrent(null)
+      setAirPollution(null)
       setError(getErrorMessage(err, city))
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   async function handleLocationSearch(lat, lon) {
@@ -92,41 +95,44 @@ function Weather() {
     setSelectedDay('all')
 
     try {
-      const forecastData = await getForecastByCoords(lat, lon)
-      const currentData = await getCurrentByCoords(lat, lon)
-
-      setPlace(forecastData.place)
-      setList(forecastData.list)
+      const [{ place, list }, currentData, airData] = await Promise.all([
+        getForecastByCoords(lat, lon),
+        getCurrentByCoords(lat, lon),
+        getAirPollution(lat, lon),
+      ])
+      setPlace(place)
+      setList(list)
       setCurrent(currentData)
-
-      saveToStorage(forecastData.place, forecastData.list, currentData)
+      setAirPollution(airData)
+      saveToStorage(place, list, currentData, airData)
     } catch (err) {
       setPlace(null)
       setList([])
       setCurrent(null)
+      setAirPollution(null)
       setError(getErrorMessage(err))
-    }
-
-    setLoading(false)
-  }
-
-  const days = []
-  for (let i = 0; i < list.length; i++) {
-    const dayLabel = formatDay(list[i].dt)
-    if (!days.includes(dayLabel)) {
-      days.push(dayLabel)
+    } finally {
+      setLoading(false)
     }
   }
 
-  let filteredList = list
-  if (selectedDay !== 'all') {
-    filteredList = []
-    for (let i = 0; i < list.length; i++) {
-      if (formatDay(list[i].dt) === selectedDay) {
-        filteredList.push(list[i])
+  const days = useMemo(() => {
+    const seen = new Set()
+    const result = []
+    for (const item of list) {
+      const label = formatDay(item.dt)
+      if (!seen.has(label)) {
+        seen.add(label)
+        result.push(label)
       }
     }
-  }
+    return result
+  }, [list])
+
+  const filteredList = useMemo(() => {
+    if (selectedDay === 'all') return list
+    return list.filter((item) => formatDay(item.dt) === selectedDay)
+  }, [list, selectedDay])
 
   return (
     <section className="weather">
@@ -147,10 +153,11 @@ function Weather() {
         </h2>
       )}
 
-      {current && !loading && (
+      {(current || airPollution) && !loading && (
         <div className="weather-dashboard">
-          <CurrentWeather data={current} />
-
+          {current && <CurrentWeather data={current} />}
+          {airPollution && <AirPollution data={airPollution} />}
+          {place && <WeatherMap place={place} />}
         </div>
       )}
 
@@ -163,7 +170,6 @@ function Weather() {
           >
             All days
           </button>
-
           {days.map((day) => (
             <button
               key={day}
